@@ -1,0 +1,6 @@
+.claude/
+android/build/
+android/*.keystore
+android/*.jks
+__pycache__/
+*.pyc

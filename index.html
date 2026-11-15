@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Temi</title>
+  <meta name="description" content="Temi: simple, joyful games for toddlers.">
+  <meta name="theme-color" content="#3EC1F3">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Temi">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preload" href="assets/fonts/fredoka-bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/shell.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- Opening screen: one big play button that unlocks audio -->
+    <section id="screen-start" class="screen is-active">
+      <img class="start-logo" src="assets/logo.png" alt="Temi" draggable="false">
+      <img class="start-mascot" src="assets/mascot.png" alt="" draggable="false">
+      <button id="play-btn" class="play-btn" aria-label="Play">
+        <svg class="play-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" pathLength="100"/></svg>
+        <svg class="play-icon" viewBox="0 0 100 100" aria-hidden="true"><path d="M38 26 L78 50 L38 74 Z"/></svg>
+      </button>
+    </section>
+
+    <!-- Home screen: picture tiles, one per game -->
+    <section id="screen-home" class="screen">
+      <header class="home-head">
+        <img class="home-logo" src="assets/logo.png" alt="Temi" draggable="false">
+        <img class="home-mascot" id="home-mascot" src="assets/mascot.png" alt="" draggable="false">
+      </header>
+      <div class="tiles" id="tiles"></div>
+      <button id="parents-btn" class="hold-btn parents-btn" aria-label="Parents: press and hold">
+        <svg class="hold-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" pathLength="100"/></svg>
+        <svg class="hold-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h1zm2.5 0h5V7a2.5 2.5 0 0 0-5 0v3z"/></svg>
+      </button>
+    </section>
+
+    <!-- Game screen: the active game mounts into #game-root -->
+    <section id="screen-game" class="screen">
+      <div id="game-root"></div>
+      <button id="home-btn" class="hold-btn home-btn" aria-label="Home: press and hold">
+        <svg class="hold-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" pathLength="100"/></svg>
+        <svg class="hold-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 2.6 11a1 1 0 0 0 .64 1.77H5V19a2 2 0 0 0 2 2h3v-5h4v5h3a2 2 0 0 0 2-2v-6.23h1.76A1 1 0 0 0 21.4 11L12 3.2z"/></svg>
+      </button>
+    </section>
+
+    <!-- Parents' corner (opened by a 2-second press on the padlock) -->
+    <div id="parents" class="modal" hidden>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="parents-title">
+        <h2 id="parents-title">Parents' corner</h2>
+        <label class="row">
+          <span>Sound</span>
+          <input type="checkbox" id="sound-toggle" class="switch" checked>
+        </label>
+        <div class="row row-install">
+          <button id="install-btn" class="pill-btn" hidden>Install Temi</button>
+          <p id="install-note" class="note"></p>
+        </div>
+        <button id="parents-close" class="pill-btn pill-btn--ghost">Done</button>
+      </div>
+    </div>
+
+  </div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
