@@ -6,7 +6,7 @@
 //   in the background, so a new deploy shows up the launch after next.
 //   Bump CACHE to force everyone onto fresh files immediately.
 
-const CACHE = "temi-v1";
+const CACHE = "temi-v2";
 
 const CORE = [
   "./",

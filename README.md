@@ -1,7 +1,12 @@
 # Temi
 
-Simple, joyful games for toddlers (ages 1–4). One game so far, **Animal Tap**, in a
-shell built so more can be added with one folder and one list entry.
+Simple, joyful games for toddlers (ages 1–4), in a shell built so more can be
+added with one folder and one list entry. Two games so far:
+
+- **Animal Tap**: tap the animal, hear its name and its sound, meet the next one.
+- **Bunny Hop**: a 3D bunny hops through a forest forever, eating carrots. A tap
+  anywhere makes it do a big jump. It jumps every obstacle by itself and eats
+  every carrot it passes, so nothing can go wrong.
 
 **Live:** https://denzeldenys.github.io/temi/
 
@@ -39,6 +44,8 @@ manifest.webmanifest    install details (name, icons, fullscreen)
 assets/                 logo, mascot, tiles, shell sounds, font
 icons/                  app icons (192, 512, maskable)
 games/animal-tap/       game.js, game.css, animals.js, assets/
+games/bunny-hop/        game.js (bunny, forest and rules, all in code), assets/ (sounds)
+vendor/                 three.js, the 3D library Bunny Hop uses (bundled, MIT)
 tools/                  asset processing and Android helpers
 ```
 
@@ -81,6 +88,19 @@ The existing assets were made with Magnific. To match them:
 - **Sound:** a 2-second sound effect, e.g. "A single panda bleat, clean close
   recording, no background noise".
 
+## Tune Bunny Hop
+
+The bunny, trees, carrots and obstacles are built from simple 3D shapes in
+`games/bunny-hop/game.js`; there are no model files. The numbers at the top of
+that file set the feel: `SPEED`, `HOP_HEIGHT`, `JUMP_HEIGHT`, `JUMP_TIME`,
+`BUNNY_SIZE`. `refillQueue()` decides what comes down the path (how many
+carrots, how often an obstacle), and `eat()` decides which sounds and voice
+lines play. To process new sounds for it:
+
+```bash
+python tools/process_assets.py raw --game bunny-hop
+```
+
 ## Add a game
 
 1. Create `games/my-game/` with a `game.js` that default-exports three things:
@@ -99,6 +119,7 @@ The existing assets were made with Magnific. To match them:
        // build the game inside `root` (it fills the screen)
        // ctx.play("pop")          -> plays this game's sound, resolves when it ends
        // ctx.play("shell:whoosh") -> shared sounds: shell:whoosh, shell:tap
+       // ctx.play("birds", { loop: true, volume: 0.5 }) -> loops until the child leaves
        // ctx.stopSounds()
      },
      stop() {
@@ -113,11 +134,12 @@ The existing assets were made with Magnific. To match them:
    { id: "my-game", name: "My Game", tile: "assets/tile-my-game.jpg", entry: "games/my-game/game.js" },
    ```
 
-   Three "coming soon" tiles are already in the list. Giving one an `entry`
+   Two "coming soon" tiles are already in the list. Giving one an `entry`
    wakes it up; an entry without `entry` shows as greyed-out and asleep.
 
 The shell supplies the home button, mute, preloading and offline caching.
-`games/animal-tap/game.js` is a complete worked example.
+`games/animal-tap/game.js` is a complete worked example in plain HTML and CSS;
+`games/bunny-hop/game.js` is one that draws in 3D.
 
 ## Deploy
 
@@ -222,4 +244,5 @@ Chrome must be installed on the phone: the app uses it behind the scenes.
 ## Credits
 
 Pictures, voice and sound effects generated with Magnific. Font: Fredoka
-(SIL Open Font License), bundled in `assets/fonts`.
+(SIL Open Font License), bundled in `assets/fonts`. 3D drawing: three.js (MIT),
+bundled in `vendor`.

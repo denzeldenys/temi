@@ -9,7 +9,7 @@
 
 export const GAMES = [
   { id: "animal-tap", name: "Animal Tap", tile: "assets/tile-animal-tap.jpg", entry: "games/animal-tap/game.js" },
+  { id: "bunny-hop", name: "Bunny Hop", tile: "assets/tile-bunny-hop.jpg", entry: "games/bunny-hop/game.js" },
   { id: "colours", name: "Colours (coming soon)", tile: "assets/tile-colours.jpg" },
   { id: "music", name: "Music (coming soon)", tile: "assets/tile-music.jpg" },
-  { id: "shapes", name: "Shapes (coming soon)", tile: "assets/tile-shapes.jpg" },
 ];

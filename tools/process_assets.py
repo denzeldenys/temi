@@ -1,6 +1,8 @@
 """Turn raw generated assets into the compressed files Temi ships.
 
-    python tools/process_assets.py <raw-dir> [--only lion,duck]
+    python tools/process_assets.py <raw-dir> [--only lion,duck] [--game bunny-hop]
+
+--game picks the folder under /games that receives the files (default animal-tap).
 
 <raw-dir> layout (all optional - whatever is present is processed):
     images/<animal>.png        cut-out animal on transparent background
@@ -9,6 +11,7 @@
     audio/<animal>-name.mp3    spoken name
     audio/<animal>-sound.mp3   animal call
     audio/temi-name.mp3, whoosh.mp3, tap.mp3
+    audio/<anything>-voice.mp3 other spoken lines; audio/ambience.mp3 a loop
 
 Needs: pip install pillow numpy imageio-ffmpeg
 """
@@ -19,7 +22,8 @@ import imageio_ffmpeg
 
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-GAME = os.path.join(ROOT, "games", "animal-tap", "assets")
+GAME_NAME = sys.argv[sys.argv.index("--game") + 1] if "--game" in sys.argv else "animal-tap"
+GAME = os.path.join(ROOT, "games", GAME_NAME, "assets")
 SHELL = os.path.join(ROOT, "assets")
 ICONS = os.path.join(ROOT, "icons")
 SR = 44100
@@ -46,7 +50,11 @@ def envelope(a, win):
     return np.sqrt((a[: n * win].reshape(n, win) ** 2).mean(axis=1))
 
 
-def trim(a, first_run_only):
+# loudness (dB RMS) for sound effects that should sit below the default -16
+LEVELS = {"hop": -27, "boing": -19, "collect": -19, "cheer": -18, "crunch": -17}
+
+
+def trim(a, first_run_only, gap_ms=240):
     """Cut leading/trailing silence. For speech keep only the first voiced run,
     which drops the stray noises TTS sometimes adds after a single word."""
     win = int(SR * 0.02)
@@ -59,7 +67,7 @@ def trim(a, first_run_only):
         gap = 0
         for i in range(start, len(loud)):
             gap = 0 if loud[i] else gap + 1
-            if gap >= 12:  # 240 ms of silence ends the word
+            if gap >= gap_ms // 20:  # this much silence ends the word / phrase
                 end = i - gap
                 break
     s = max(0, start * win - int(SR * 0.03))
@@ -85,6 +93,13 @@ def process_audio(path):
     a = load(path)
     if name.endswith("-name"):
         out = finish(trim(a, True), -14)
+    elif name.endswith("-voice"):
+        out = finish(trim(a, True, 600), -14)
+    elif name == "ambience":  # seamless loop: keep every sample, just set the level
+        rms = np.sqrt((a ** 2).mean())
+        out = a * min(10 ** (-30 / 20) / max(rms, 1e-6), 0.89 / max(np.abs(a).max(), 1e-6))
+    elif name in LEVELS:
+        out = finish(trim(a, False)[: int(SR * 2.4)], LEVELS[name], 0.12)
     elif name == "whoosh":
         out = finish(trim(a, False), -24, 0.15)
     elif name == "tap":
@@ -170,7 +185,7 @@ def main():
         name = os.path.splitext(os.path.basename(f))[0]
         if not want(name):
             continue
-        if name.startswith("tile-"):
+        if name.startswith("tile-"):  # tiles always go to the shell's assets
             process_tile(f)
         elif name == "logo":
             save_png(cutout(f, 900), os.path.join(SHELL, "logo.png"))

@@ -179,7 +179,7 @@ function setupStart(loading) {
     audio.unlock(); // inside the gesture
     btn.classList.add("is-loading");
     await loading;
-    await audio.unlock();
+    await Promise.race([audio.unlock(), wait(400)]); // never wait long on the browser's audio
     show("screen-home");
     const mascot = $("#home-mascot");
     mascot.classList.add("is-cheering");

@@ -48,7 +48,7 @@ class AudioManager {
   has(key) { return this.buffers.has(key); }
 
   /** Play a loaded sound. Resolves when it has finished (or straight away if it can't play). */
-  play(key, { volume = 1 } = {}) {
+  play(key, { volume = 1, loop = false } = {}) {
     const buffer = this.buffers.get(key);
     this.log.push({ key, at: Math.round(performance.now()), ok: !!buffer });
     if (this.log.length > 60) this.log.shift();
@@ -58,6 +58,7 @@ class AudioManager {
       const gain = this.ctx.createGain();
       gain.gain.value = volume;
       src.buffer = buffer;
+      src.loop = loop; // a looping sound plays until stopAll()
       src.connect(gain).connect(this.master);
       let done = false;
       const finish = () => {
@@ -68,7 +69,7 @@ class AudioManager {
         resolve();
       };
       // Safety net so the game never gets stuck if "ended" doesn't fire.
-      const timer = setTimeout(finish, buffer.duration * 1000 + 400);
+      const timer = loop ? 0 : setTimeout(finish, buffer.duration * 1000 + 400);
       src.onended = finish;
       src.stopNow = () => { try { src.stop(); } catch {} finish(); };
       this.active.add(src);
